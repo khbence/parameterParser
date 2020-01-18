@@ -2,3 +2,4 @@ Debug/*
 !Debug/create_makefile.sh
 Release/*
 !Release/create_makefile.sh
+compile_commands.json
