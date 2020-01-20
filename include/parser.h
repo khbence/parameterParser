@@ -1,5 +1,6 @@
 #include <optional>
 #include <type_traits>
+#include <string>
 
 namespace pparser {
     namespace internal {
@@ -75,12 +76,31 @@ namespace pparser {
         __member_typelist;
     }
 
+    namespace impl {
+        template<typename T, int ID>
+        class parameterObject {
+            static std::string longName;
+            static T* memberPointer;
+        public:
+            parameterObject(const std::string& longName_p, T* memberPointer_p) {
+                longName = longName_p;
+                memberPointer = memberPointer_p;
+            }
+        };
+
+        template<typename T, int ID> std::string parameterObject<T, ID>::longName;
+        template<typename T, int ID> T* parameterObject<T, ID>::memberPointer;
+    }
+
     #define BEGIN_PARAMETER_DECLARATION() \
     _START_LIST()
 
     #define ADD_PARAMETER(shortName, longName, isOptional, parType, defaultValue) \
-    parType longName = defaultValue;
+    std::conditional<isOptional, std::optional<parType>, parType>::type longName = defaultValue; \
+    typedef typename ::pparser::impl::parameterObject<decltype(longName), __COUNTER__> __##longName##_type; \
+    __##longName##_type __##longName##_instance = __##longName##_type(#longName, &longName); \
+    _ADD_TO_LIST(__##longName##_type)
 
-    #define END_PARAMETER_DECLARATION \
+    #define END_PARAMETER_DECLARATION() \
     _END_LIST()
 }
