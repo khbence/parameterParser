@@ -3,3 +3,4 @@ Debug/*
 Release/*
 !Release/create_makefile.sh
 compile_commands.json
+.vscode
