@@ -214,6 +214,9 @@ namespace pparser {
     #define ADD_PARAMETER_NO_DEFAULT(shortName, longName, isOptional, parType) \
     ADD_PARAMETER_RAW(shortName, longName, isOptional, true, !isOptional, parType, {})
 
+    #define ADD_PARAMETER_FLAG(shortName, longName) \
+    ADD_PARAMETER_RAW(shortName, longName, false, false, false, bool, false)
+
     #define END_PARAMETER_DECLARATION() \
     _END_LIST()
 

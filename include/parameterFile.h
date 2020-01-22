@@ -8,7 +8,7 @@ public:
 
     ADD_PARAMETER(s, SVSize, true, true, double, 0.5);
     ADD_PARAMETER(b, binding, false, true, double, 1.0);
-    ADD_PARAMETER(w, suppressWarning, true, false, bool, false);
+    ADD_PARAMETER_FLAG(w, suppressWarning);
     ADD_PARAMETER_DEFAULT_VALUE(d, defEx, std::string, "kecske");
     ADD_PARAMETER_NO_DEFAULT(n, nd, true, double);
     //ADD_PARAMETER(afile, false, true, std::string)
