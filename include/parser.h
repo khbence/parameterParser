@@ -99,22 +99,22 @@ namespace pparser {
             static std::optional<char> shortName;
             static std::string longName;
             static T* memberPointer;
-            static bool isOptional; //calculate it from the types
+            static bool required; //calculate it from the types
             static bool hasArgument;
 
-            parameterObject(char shortName_p, const std::string& longName_p, T* memberPointer_p, bool isOptional_p, bool hasArgument_p) {
+            parameterObject(char shortName_p, const std::string& longName_p, T* memberPointer_p, bool isRequired_p, bool hasArgument_p) {
                 shortName = shortName_p;
                 longName = longName_p;
                 memberPointer = memberPointer_p;
-                isOptional = isOptional_p;
+                required = isRequired_p;
                 hasArgument = hasArgument_p;
             }
 
-            parameterObject(const std::string& longName_p, T* memberPointer_p, bool isOptional_p, bool hasArgument_p) {
+            parameterObject(const std::string& longName_p, T* memberPointer_p, bool isRequired_p, bool hasArgument_p) {
                 shortName = {};
                 longName = longName_p;
                 memberPointer = memberPointer_p;
-                isOptional = isOptional_p;
+                required = isRequired_p;
                 hasArgument = hasArgument_p;
             }
         };
@@ -122,7 +122,7 @@ namespace pparser {
         template<typename T, int ID> std::optional<char> parameterObject<T, ID>::shortName;
         template<typename T, int ID> std::string parameterObject<T, ID>::longName;
         template<typename T, int ID> T* parameterObject<T, ID>::memberPointer;
-        template<typename T, int ID> bool parameterObject<T, ID>::isOptional;
+        template<typename T, int ID> bool parameterObject<T, ID>::required;
         template<typename T, int ID> bool parameterObject<T, ID>::hasArgument;
 
 
@@ -176,8 +176,8 @@ namespace pparser {
                             (*T::memberPointer) = true;
                         }
                     }
-                    if(!found && !T::isOptional) { throw missingParameter(T::shortName.value(), T::longName); }
-                } else if (!found && !T::isOptional) { throw missingParameter(T::longName); }
+                    if(!found && T::required) { throw missingParameter(T::shortName.value(), T::longName); }
+                } else if (!found && T::required) { throw missingParameter(T::longName); }
             }
         };
 
@@ -202,11 +202,18 @@ namespace pparser {
     #define BEGIN_PARAMETER_DECLARATION() \
     _START_LIST()
 
-    #define ADD_PARAMETER(shortName, longName, isOptional, hasArgument, parType, defaultValue) \
+    #define ADD_PARAMETER_RAW(shortName, longName, isOptional, hasArgument, required, parType, defaultValue) \
     std::conditional<isOptional, std::optional<parType>, parType>::type longName = defaultValue; \
     typedef typename ::pparser::impl::parameterObject<decltype(longName), __COUNTER__> __##longName##_type; \
-    __##longName##_type __##longName##_instance = __##longName##_type((#shortName)[0], #longName, &longName, isOptional, hasArgument); \
+    __##longName##_type __##longName##_instance = __##longName##_type((#shortName)[0], #longName, &longName, required, hasArgument); \
     _ADD_TO_LIST(__##longName##_type)
+
+    #define ADD_PARAMETER(shortName, longName, isOptional, hasArgument, parType, defaultValue) \
+    ADD_PARAMETER_RAW(shortName, longName, isOptional, hasArgument, !isOptional, parType, defaultValue)
+
+    //not gonna be an optional type
+    #define ADD_PARAMETER_DEFAULT_VALUE(shortName, longName, parType, defaultValue) \
+    ADD_PARAMETER_RAW(shortName, longName, false, true, false, parType, defaultValue)
 
     #define END_PARAMETER_DECLARATION() \
     _END_LIST()
@@ -259,6 +266,7 @@ namespace pparser {
         static parameterFileType createParameterFile(int argc, char const **argv) {
             auto[longNames, shortNames] = parseTheArgsToMaps(argc, argv);
             return ::pparser::impl::__object_value_decoder<parameterFileType>::get(longNames, shortNames);
+            //TODO check if any required missing, or something hasn't been used
         }
     };
 }
