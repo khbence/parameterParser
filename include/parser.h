@@ -103,15 +103,11 @@ namespace pparser {
             static bool hasArgument;
 
             parameterObject(char shortName_p, const std::string& longName_p, T* memberPointer_p, bool isRequired_p, bool hasArgument_p) {
-                shortName = shortName_p;
-                longName = longName_p;
-                memberPointer = memberPointer_p;
-                required = isRequired_p;
-                hasArgument = hasArgument_p;
-            }
-
-            parameterObject(const std::string& longName_p, T* memberPointer_p, bool isRequired_p, bool hasArgument_p) {
-                shortName = {};
+                if(shortName_p == '-') {
+                    shortName = {};
+                } else {
+                    shortName = shortName_p;
+                }
                 longName = longName_p;
                 memberPointer = memberPointer_p;
                 required = isRequired_p;
