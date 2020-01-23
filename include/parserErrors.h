@@ -31,12 +31,12 @@ namespace pparser {
     };
 
     struct unnecessaryArgument : public parserError {
-        unnecessaryArgument(std::string& l) : parserError("--" + l + "does not requires any argument!\n") {}
-        unnecessaryArgument(char s) : parserError("-" + std::string(1, s) + "does not requires any argument!\n") {}
+        unnecessaryArgument(std::string& l) : parserError("--" + l + " does not requires any argument!\n") {}
+        unnecessaryArgument(char s) : parserError("-" + std::string(1, s) + " does not requires any argument!\n") {}
     };
 
     struct missingParameter : public parserError {
-        missingParameter(char s, std::string& l) : parserError("-" + std::string(1, s) + " or " + "--" + l + "need to be defined!\n") {};
-        missingParameter(std::string& l) : parserError("--" + l + "need to be defined!\n") {};
+        missingParameter(char s, std::string& l) : parserError("-" + std::string(1, s) + " or " + "--" + l + " need to be defined!\n") {};
+        missingParameter(std::string& l) : parserError("--" + l + " need to be defined!\n") {};
     };
 }
