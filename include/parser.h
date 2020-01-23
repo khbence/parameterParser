@@ -135,6 +135,12 @@ namespace pparser {
             }
         };
 
+        template<typename B, typename T>
+        void setTrue() {}
+
+        template<bool, typename T>
+        void setTrue() { (*T::memberPointer) = true; }
+
         template <typename T>
         struct __decode_member;
 
@@ -154,7 +160,7 @@ namespace pparser {
                         (*T::memberPointer) = tmp;
                     } else {
                         if(itl->second) { throw unnecessaryArgument(T::longName); }
-                        (*T::memberPointer) = true;
+                        setTrue<typename T::paramType, T>();
                     }
                 }
                 if(T::shortName) {
@@ -169,7 +175,7 @@ namespace pparser {
                             (*T::memberPointer) = tmp;
                         } else {
                             if(its->second) { throw unnecessaryArgument(T::shortName.value()); }
-                            (*T::memberPointer) = true;
+                            setTrue<typename T::paramType, T>();
                         }
                     }
                     if(!found && T::required) { throw missingParameter(T::shortName.value(), T::longName); }
