@@ -68,14 +68,14 @@ namespace pparser {
         template <int N> struct Counter : Counter<N - 1> {};
         template <> struct Counter<0> {};
         
-        #define _START_LIST() \
+        #define _START_LIST_PPARSER() \
         static ::pparser::internal::Void __list_maker_helper(::pparser::internal::Counter<__COUNTER__>)
         
-        #define _ADD_TO_LIST(type) \
+        #define _ADD_TO_LIST_PPARSER(type) \
         static ::pparser::internal::RecursiveTypelist<type, decltype(__list_maker_helper(::pparser::internal::Counter<__COUNTER__>{}))> \
         __list_maker_helper(::pparser::internal::Counter<__COUNTER__>)
         
-        #define _END_LIST() \
+        #define _END_LIST_PPARSER() \
         typedef \
         ::pparser::internal::FlattenRecursiveTypelist<decltype(__list_maker_helper(::pparser::internal::Counter<__COUNTER__>{}))>::value \
         __member_typelist;
@@ -202,13 +202,13 @@ namespace pparser {
     }
 
     #define BEGIN_PARAMETER_DECLARATION() \
-    _START_LIST()
+    _START_LIST_PPARSER()
 
     #define ADD_PARAMETER_RAW(shortName, longName, isOptional, hasArgument, required, parType, defaultValue) \
     std::conditional<isOptional, std::optional<parType>, parType>::type longName = defaultValue; \
     typedef typename ::pparser::impl::parameterObject<decltype(longName), __COUNTER__> __##longName##_type; \
     __##longName##_type __##longName##_instance = __##longName##_type((#shortName)[0], #longName, &longName, required, hasArgument); \
-    _ADD_TO_LIST(__##longName##_type)
+    _ADD_TO_LIST_PPARSER(__##longName##_type)
 
     #define ADD_PARAMETER(shortName, longName, isOptional, hasArgument, parType, defaultValue) \
     ADD_PARAMETER_RAW(shortName, longName, isOptional, hasArgument, !isOptional, parType, defaultValue)
@@ -224,7 +224,7 @@ namespace pparser {
     ADD_PARAMETER_RAW(shortName, longName, false, false, false, bool, false)
 
     #define END_PARAMETER_DECLARATION() \
-    _END_LIST()
+    _END_LIST_PPARSER()
 
     template<typename parameterFileType>
     class parser {
