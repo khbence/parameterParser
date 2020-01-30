@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include "parserErrors.h"
+#include <iostream>
 
 namespace pparser {
     namespace internal {
