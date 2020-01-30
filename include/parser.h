@@ -314,11 +314,11 @@ namespace pparser {
         }
 
     public:
-        static std::optional<parameterFileType> createParameterFile(int argc, char const **argv) {
+        static parameterFileType createParameterFile(int argc, char const **argv) {
             auto[longNames, shortNames] = parseTheArgsToMaps(argc, argv);
             auto ret = ::pparser::impl::__object_value_decoder<parameterFileType>::get(longNames, shortNames);
             if(longNames.count("help") || shortNames.count('h')) {
-                return {};
+                throw helpWasCalled();
             }
             return ret;
             //TODO check if any required missing, or something hasn't been used
