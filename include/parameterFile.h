@@ -6,7 +6,7 @@ class ParameterFile {
 public:
     BEGIN_PARAMETER_DECLARATION();
 
-    ADD_PARAMETER(s, SVSize, true, true, double, 0.5);
+    ADD_PARAMETER_H(s, SVSize, true, true, double, 0.5, "size of the SVs");
     ADD_PARAMETER(b, binding, false, true, double, 1.0);
     ADD_PARAMETER_DEFAULT_VALUE(d, defEx, std::string, "kecske");
     ADD_PARAMETER_NO_DEFAULT(n, nd, true, double);
