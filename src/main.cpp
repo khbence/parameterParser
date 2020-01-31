@@ -10,7 +10,7 @@ int main(int argc, char const *argv[]) {
         << " - " << params.defEx << " - " << params.nd.value() << std::endl;
     } catch(pparser::parserError& e) {
         std::cerr << e.what();
-    } catch(pparser::helpWasCalled& e) {
+    } catch(pparser::helpWasCalled&) {
         return EXIT_SUCCESS;
     }
     return 0;
