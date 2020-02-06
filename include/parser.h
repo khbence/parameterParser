@@ -155,7 +155,7 @@ namespace pparser {
         };
 
         template <typename T>
-        struct __decode_member;
+        class __decode_member;
 
         template <typename T>
         class __decode_member {
@@ -169,13 +169,13 @@ namespace pparser {
                     length += 4;
                 }
                 std::cout << "--" << T::longName;
-                length += 2 + T::longName.size();
+                length += 2 + static_cast<unsigned>(T::longName.size());
                 if(T::help) {
-                    int indent = paddingForHelp - length;
+                    int indent = static_cast<int>(paddingForHelp) - static_cast<int>(length);
                     if(indent < 2) {
                         std::cout << '\t';
                     } else {
-                        std::cout << std::string(indent, ' ');
+                        std::cout << std::string(static_cast<size_t>(indent), ' ');
                     }
                     std::cout << T::help.value();
                 }
@@ -278,7 +278,7 @@ namespace pparser {
     class parser {
         static std::vector<std::string> formatArgv(int argc, char const** argv) {
             std::vector<std::string> ret;
-            ret.reserve(argc);
+            ret.reserve(static_cast<size_t>(argc));
             for(int i = 1; i < argc; ++i) {
                 ret.emplace_back(argv[i]);
             }
