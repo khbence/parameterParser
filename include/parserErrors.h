@@ -13,8 +13,6 @@ namespace pparser {
         }
     };
 
-    struct helpWasCalled : public std::exception {};
-
     struct tooMuchArguments : public parserError {
         tooMuchArguments(const std::string& value) : parserError(value + " cannot bind to any parameter, because the previous object is a value!\n") {}
     };

@@ -70,13 +70,14 @@ namespace pparser {
         template <> struct Counter<0> {};
         
         #define _START_LIST_PPARSER() \
-        static ::pparser::internal::Void __list_maker_helper(::pparser::internal::Counter<__COUNTER__>)
+        static ::pparser::internal::Void __list_maker_helper(::pparser::internal::Counter<__COUNTER__>) \
         
         #define _ADD_TO_LIST_PPARSER(type) \
         static ::pparser::internal::RecursiveTypelist<type, decltype(__list_maker_helper(::pparser::internal::Counter<__COUNTER__>{}))> \
         __list_maker_helper(::pparser::internal::Counter<__COUNTER__>)
         
         #define _END_LIST_PPARSER() \
+        ADD_PARAMETER_FLAG_H(h, help, "Prints this help"); \
         typedef \
         ::pparser::internal::FlattenRecursiveTypelist<decltype(__list_maker_helper(::pparser::internal::Counter<__COUNTER__>{}))>::value \
         __member_typelist;
@@ -187,8 +188,8 @@ namespace pparser {
                                     , std::map<char, std::optional<std::stringstream>>& shortNames) {
                 if(longNames.count("help") || shortNames.count('h')) {
                     printHelp();
-                    return;
                 }
+                if((T::shortName.value() != 'h')) { return; }
                 //TODO handle bad optional and argument and no default
                 auto itl = longNames.find(T::longName);
                 bool found = false;
@@ -322,11 +323,9 @@ namespace pparser {
         static parameterFileType createParameterFile(int argc, char const **argv) {
             auto[longNames, shortNames] = parseTheArgsToMaps(argc, argv);
             auto ret = ::pparser::impl::__object_value_decoder<parameterFileType>::get(longNames, shortNames);
-            if(longNames.count("help") || shortNames.count('h')) {
-                throw helpWasCalled();
-            }
             return ret;
             //TODO check if any required missing, or something hasn't been used
         }
     };
+    #define PARSE_PARAMETERS
 }

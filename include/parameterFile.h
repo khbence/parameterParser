@@ -11,7 +11,6 @@ public:
     ADD_PARAMETER_DEFAULT_VALUE(d, defEx, std::string, "kecske");
     ADD_PARAMETER_NO_DEFAULT(n, nd, true, double);
     ADD_PARAMETER_FLAG(w, suppressWarning);
-    //ADD_PARAMETER(afile, false, true, std::string)
 
     END_PARAMETER_DECLARATION();
 };
