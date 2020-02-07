@@ -77,7 +77,14 @@ namespace pparser {
         __list_maker_helper(::pparser::internal::Counter<__COUNTER__>)
         
         #define _END_LIST_PPARSER() \
+        private: \
         ADD_PARAMETER_FLAG_H(h, help, "Prints this help"); \
+        bool __errorHappened = false; \
+        template<typename T> \
+        friend class ::pparser::parser; \
+        public: \
+        bool isHelpWasCalled() const { return help; } \
+        bool isErrorHappened() const { return __errorHappened; } \
         typedef \
         ::pparser::internal::FlattenRecursiveTypelist<decltype(__list_maker_helper(::pparser::internal::Counter<__COUNTER__>{}))>::value \
         __member_typelist;
@@ -188,9 +195,8 @@ namespace pparser {
                                     , std::map<char, std::optional<std::stringstream>>& shortNames) {
                 if(longNames.count("help") || shortNames.count('h')) {
                     printHelp();
+                    if((T::shortName.value() != 'h')) { return; }
                 }
-                if((T::shortName.value() != 'h')) { return; }
-                //TODO handle bad optional and argument and no default
                 auto itl = longNames.find(T::longName);
                 bool found = false;
                 if(itl != longNames.end()) {
@@ -322,10 +328,17 @@ namespace pparser {
     public:
         static parameterFileType createParameterFile(int argc, char const **argv) {
             auto[longNames, shortNames] = parseTheArgsToMaps(argc, argv);
-            auto ret = ::pparser::impl::__object_value_decoder<parameterFileType>::get(longNames, shortNames);
+            parameterFileType ret;
+            try {
+                ret = ::pparser::impl::__object_value_decoder<parameterFileType>::get(longNames, shortNames);
+            } catch(parserError& e) {
+                std::cerr << e.what();
+                ret.__errorHappened = true;
+            }
             return ret;
-            //TODO check if any required missing, or something hasn't been used
+            //TODO check if something hasn't been used
         }
     };
-    #define PARSE_PARAMETERS
+    #define PARSE_PARAMETERS(argc, argv, parameterClass) \
+    ::pparser::parser<parameterClass>::createParameterFile(argc, argv);
 }
