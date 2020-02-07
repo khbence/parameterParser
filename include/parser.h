@@ -168,24 +168,37 @@ namespace pparser {
         template <typename T>
         class __decode_member {
             static constexpr unsigned paddingForHelp = 30;
+            static constexpr unsigned lengthOfWindow = 80;
 
             static void printHelp() {
                 std::cout << "  ";
-                unsigned length = 2;
+                size_t length = 2;
                 if(T::shortName) {
                     std::cout << "-" << T::shortName.value() << ", ";
                     length += 4;
                 }
                 std::cout << "--" << T::longName;
-                length += 2 + static_cast<unsigned>(T::longName.size());
+                length += 2 + T::longName.size();
                 if(T::help) {
                     int indent = static_cast<int>(paddingForHelp) - static_cast<int>(length);
                     if(indent < 2) {
-                        std::cout << '\t';
+                        std::cout << std::string(4, ' ');
+                        length += 4;
                     } else {
                         std::cout << std::string(static_cast<size_t>(indent), ' ');
+                        length = paddingForHelp;
                     }
-                    std::cout << T::help.value();
+                    std::stringstream ss(T::help.value());
+                    while(ss) {
+                        std::string tmp;
+                        ss >> tmp;
+                        length += tmp.size();
+                        if(length > lengthOfWindow) {
+                            std::cout << '\n' << std::string(30, ' ');
+                            length = 30 + tmp.size();
+                        }
+                        std::cout << tmp << " ";
+                    }
                 }
                 std::cout << std::endl;
             }
@@ -195,7 +208,7 @@ namespace pparser {
                                     , std::map<char, std::optional<std::stringstream>>& shortNames) {
                 if(longNames.count("help") || shortNames.count('h')) {
                     printHelp();
-                    if((T::shortName.value() != 'h')) { return; }
+                    if((T::longName != "help")) { return; }
                 }
                 auto itl = longNames.find(T::longName);
                 bool found = false;
