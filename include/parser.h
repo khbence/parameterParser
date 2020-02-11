@@ -353,5 +353,5 @@ namespace pparser {
         }
     };
     #define PARSE_PARAMETERS(argc, argv, parameterClass) \
-    ::pparser::parser<parameterClass>::createParameterFile(argc, argv);
+    ::pparser::parser<parameterClass>::createParameterFile(argc, argv)
 }
