@@ -223,6 +223,7 @@ namespace pparser {
                         if(itl->second) { throw unnecessaryArgument(T::longName); }
                         setTrue<typename T::paramType, T> t; t();
                     }
+                    longNames.erase(itl);
                 }
                 if(T::shortName) {
                     auto its = shortNames.find(T::shortName.value());
@@ -238,6 +239,7 @@ namespace pparser {
                             if(its->second) { throw unnecessaryArgument(T::shortName.value()); }
                             setTrue<typename T::paramType, T> t; t();
                         }
+                        shortNames.erase(its);
                     }
                     if(!found && T::required) { throw missingParameter(T::shortName.value(), T::longName); }
                 } else if (!found && T::required) { throw missingParameter(T::longName); }
@@ -340,16 +342,21 @@ namespace pparser {
 
     public:
         static parameterFileType createParameterFile(int argc, char const **argv) {
-            auto[longNames, shortNames] = parseTheArgsToMaps(argc, argv);
             parameterFileType ret;
             try {
+                auto[longNames, shortNames] = parseTheArgsToMaps(argc, argv);
                 ret = ::pparser::impl::__object_value_decoder<parameterFileType>::get(longNames, shortNames);
+                for(const auto& e : longNames) {
+                    std::cout << "[WARNING] Unused parameter: " << e.first;
+                }
+                for(const auto& e : shortNames) {
+                    std::cout << "[WARNING] Unused parameter: " << e.first;
+                }
             } catch(parserError& e) {
                 std::cerr << e.what();
                 ret.__errorHappened = true;
             }
             return ret;
-            //TODO check if something hasn't been used
         }
     };
     #define PARSE_PARAMETERS(argc, argv, parameterClass) \
