@@ -264,6 +264,14 @@ namespace pparser {
         };
     }
 
+    template<typename T>
+    std::string createHelp(std::string help, T defaultValue) {
+        std::stringstream ss;
+        ss << help << " [default: " << defaultValue << "]";
+        std::string ret = ss.str();
+        return ret;
+    }
+
     #define BEGIN_PARAMETER_DECLARATION() \
     _START_LIST_PPARSER()
 
@@ -274,12 +282,12 @@ namespace pparser {
     _ADD_TO_LIST_PPARSER(__##longName##_type)
 
     #define ADD_PARAMETER_H(shortName, longName, isOptional, hasArgument, parType, defaultValue, help) \
-    ADD_PARAMETER_RAW(shortName, longName, isOptional, hasArgument, !isOptional, parType, defaultValue, help)
+    ADD_PARAMETER_RAW(shortName, longName, isOptional, hasArgument, !isOptional, parType, defaultValue, ::pparser::createHelp(help, defaultValue))
     #define ADD_PARAMETER(shortName, longName, isOptional, hasArgument, parType, defaultValue) \
     ADD_PARAMETER_H(shortName, longName, isOptional, hasArgument, parType, defaultValue, "")
 
     #define ADD_PARAMETER_DEFAULT_VALUE_H(shortName, longName, parType, defaultValue, help) \
-    ADD_PARAMETER_RAW(shortName, longName, false, true, false, parType, defaultValue, help)
+    ADD_PARAMETER_RAW(shortName, longName, false, true, false, parType, defaultValue, ::pparser::createHelp(help, defaultValue))
     #define ADD_PARAMETER_DEFAULT_VALUE(shortName, longName, parType, defaultValue) \
     ADD_PARAMETER_DEFAULT_VALUE_H(shortName, longName, parType, defaultValue, "")
 
