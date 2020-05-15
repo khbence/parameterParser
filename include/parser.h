@@ -1,5 +1,5 @@
 #pragma once
-#include <optional>
+#include "optional.h"
 #include <type_traits>
 #include <string>
 #include <sstream>
@@ -97,7 +97,7 @@ namespace pparser {
         };
 
         template<typename T>
-        struct removeOptionalOptional<std::optional<T>> {
+        struct removeOptionalOptional<stc::optional<T>> {
             typedef T value;
         };
 
@@ -105,12 +105,12 @@ namespace pparser {
         struct parameterObject {
             typedef typename removeOptionalOptional<T>::value paramType;
 
-            static std::optional<char> shortName;
+            static stc::optional<char> shortName;
             static std::string longName;
             static T* memberPointer;
             static bool required; //calculate it from the types
             static bool hasArgument;
-            static std::optional<std::string> help;
+            static stc::optional<std::string> help;
 
             parameterObject(char shortName_p
                             , const std::string& longName_p
@@ -131,12 +131,12 @@ namespace pparser {
             }
         };
 
-        template<typename T, int ID> std::optional<char> parameterObject<T, ID>::shortName;
+        template<typename T, int ID> stc::optional<char> parameterObject<T, ID>::shortName;
         template<typename T, int ID> std::string parameterObject<T, ID>::longName;
         template<typename T, int ID> T* parameterObject<T, ID>::memberPointer;
         template<typename T, int ID> bool parameterObject<T, ID>::required;
         template<typename T, int ID> bool parameterObject<T, ID>::hasArgument;
-        template<typename T, int ID> std::optional<std::string> parameterObject<T, ID>::help;
+        template<typename T, int ID> stc::optional<std::string> parameterObject<T, ID>::help;
 
 
         template <typename TL>
@@ -144,8 +144,8 @@ namespace pparser {
         
         template <typename R>
         struct __object_value_decoder {
-            static R get(std::map<std::string, std::optional<std::stringstream>>& longNames
-                        , std::map<char, std::optional<std::stringstream>>& shortNames) {
+            static R get(std::map<std::string, stc::optional<std::stringstream>>& longNames
+                        , std::map<char, stc::optional<std::stringstream>>& shortNames) {
                 R ret;
                 __decode_member_list<typename R::__member_typelist>::decode(longNames, shortNames);
                 return ret;
@@ -204,8 +204,8 @@ namespace pparser {
             }
 
         public:
-            static void decode(std::map<std::string, std::optional<std::stringstream>>& longNames
-                                    , std::map<char, std::optional<std::stringstream>>& shortNames) {
+            static void decode(std::map<std::string, stc::optional<std::stringstream>>& longNames
+                                    , std::map<char, stc::optional<std::stringstream>>& shortNames) {
                 if(longNames.count("help") || shortNames.count('h')) {
                     printHelp();
                     if((T::longName != "help")) { return; }
@@ -248,8 +248,8 @@ namespace pparser {
 
         template <typename H, typename... T>
         struct __decode_member_list<::pparser::internal::Typelist<H, T...>> {
-            static void decode(std::map<std::string, std::optional<std::stringstream>>& longNames
-                                    , std::map<char, std::optional<std::stringstream>>& shortNames) {
+            static void decode(std::map<std::string, stc::optional<std::stringstream>>& longNames
+                                    , std::map<char, stc::optional<std::stringstream>>& shortNames) {
                 __decode_member<H>::decode(longNames, shortNames);
                 __decode_member_list<::pparser::internal::Typelist<T...>>::decode(longNames, shortNames);
             }
@@ -257,8 +257,8 @@ namespace pparser {
         
         template <typename H>
         struct __decode_member_list<::pparser::internal::Typelist<H>> {
-            static void decode(std::map<std::string, std::optional<std::stringstream>>& longNames
-                                    , std::map<char, std::optional<std::stringstream>>& shortNames) {
+            static void decode(std::map<std::string, stc::optional<std::stringstream>>& longNames
+                                    , std::map<char, stc::optional<std::stringstream>>& shortNames) {
                 __decode_member<H>::decode(longNames, shortNames);
             }
         };
@@ -276,7 +276,7 @@ namespace pparser {
     _START_LIST_PPARSER()
 
     #define ADD_PARAMETER_RAW(shortName, longName, isOptional, hasArgument, required, parType, defaultValue, help) \
-    std::conditional<isOptional, std::optional<parType>, parType>::type longName = defaultValue; \
+    std::conditional<isOptional, stc::optional<parType>, parType>::type longName = defaultValue; \
     typedef typename ::pparser::impl::parameterObject<decltype(longName), __COUNTER__> __##longName##_type; \
     __##longName##_type __##longName##_instance = __##longName##_type((#shortName)[0], #longName, &longName, required, hasArgument, help); \
     _ADD_TO_LIST_PPARSER(__##longName##_type)
@@ -317,8 +317,8 @@ namespace pparser {
 
         static auto parseTheArgsToMaps(int argc, char const** argv) {
             const std::vector<std::string> arguments = formatArgv(argc, argv);
-            std::map<std::string, std::optional<std::stringstream>> longNames;
-            std::map<char, std::optional<std::stringstream>> shortNames;
+            std::map<std::string, stc::optional<std::stringstream>> longNames;
+            std::map<char, stc::optional<std::stringstream>> shortNames;
             auto it = arguments.begin();
             while(it != arguments.end()) {
                 //TODO handle ugly cases
@@ -330,18 +330,18 @@ namespace pparser {
                     current.erase(0, 1);
                     ++it;
                     if((it != arguments.end()) && (*it)[0] != '-') {
-                        longNames.emplace(current, *it);
+                        longNames.emplace(current, stc::optional<std::stringstream>(std::stringstream(*it)));
                         ++it;
                     } else {
-                        longNames.emplace(current, std::optional<std::stringstream>());
+                        longNames.emplace(current, stc::optional<std::stringstream>());
                     }
                 } else {
                     ++it;
                     if((it != arguments.end()) && (*it)[0] != '-') {
-                        shortNames.emplace(current[0], *it);
+                        shortNames.emplace(current[0], stc::optional<std::stringstream>(std::stringstream(*it)));
                         ++it;
                     } else {
-                        shortNames.emplace(current[0], std::optional<std::stringstream>());
+                        shortNames.emplace(current[0], stc::optional<std::stringstream>());
                     }
                 }
             }
@@ -352,7 +352,9 @@ namespace pparser {
         static parameterFileType createParameterFile(int argc, char const **argv) {
             parameterFileType ret;
             try {
-                auto[longNames, shortNames] = parseTheArgsToMaps(argc, argv);
+                auto tmp = parseTheArgsToMaps(argc, argv);
+                auto longNames = tmp.first;
+                auto shortNames = tmp.second;
                 ret = ::pparser::impl::__object_value_decoder<parameterFileType>::get(longNames, shortNames);
                 for(const auto& e : longNames) {
                     std::cout << "[WARNING] Unused parameter: " << e.first;
