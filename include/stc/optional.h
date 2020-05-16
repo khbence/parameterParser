@@ -3,8 +3,9 @@
 #include <utility>
 #include <sstream>
 
+namespace pparser {
 // standard custom, to replace the used c++17 features
-namespace stc {
+namespace CXX17 {
     class bad_optional_access : public std::exception {
         [[nodiscard]] const char* what() const noexcept override { return "Bad optional access!"; }
     };
@@ -38,12 +39,12 @@ namespace stc {
 
         T& value() {
             if (hasData) { return data; }
-            throw stc::bad_optional_access();
+            throw CXX17::bad_optional_access();
         }
 
         const T& value() const {
             if (hasData) { return data; }
-            throw stc::bad_optional_access();
+            throw CXX17::bad_optional_access();
         }
 
         decltype(auto) value_or(T&& default_value) {
@@ -63,7 +64,7 @@ namespace stc {
     };
 
     template<>
-    optional<std::stringstream>::optional(const stc::optional<std::stringstream>& other) {
+    optional<std::stringstream>::optional(const CXX17::optional<std::stringstream>& other) {
         if(other.hasData) {
             hasData = true;
             data << other.data.rdbuf();
@@ -71,3 +72,4 @@ namespace stc {
         hasData = false;
     }
 }// namespace stc
+}
