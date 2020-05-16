@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.0)
 
 project(parameterParser)
-include_directories(include include/stc)
+include_directories(include include/CXX17)
 
 set (CMAKE_CXX_STANDARD 14)
 
