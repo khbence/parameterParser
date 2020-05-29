@@ -68,8 +68,9 @@ namespace CXX17 {
         if(other.hasData) {
             hasData = true;
             data << other.data.rdbuf();
-        }
-        hasData = false;
+        } else {
+            hasData = false;
+	}
     }
 }// namespace stc
 }
