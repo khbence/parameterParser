@@ -6,7 +6,7 @@ namespace pparser {
     class parserError : public std::exception {
         std::string error;
     public:
-        parserError(const std::string& error_p) : error(error_p) {}
+        explicit parserError(const std::string& error_p) : error(error_p) {}
 
         const char *what() const noexcept override {
            return error.c_str();
@@ -14,11 +14,11 @@ namespace pparser {
     };
 
     struct tooMuchArguments : public parserError {
-        tooMuchArguments(const std::string& value) : parserError(value + " cannot bind to any parameter, because the previous object is a value!\n") {}
+        explicit tooMuchArguments(const std::string& value) : parserError(value + " cannot bind to any parameter, because the previous object is a value!\n") {}
     };
 
     struct badFormatLongArgument : public parserError {
-        badFormatLongArgument(const std::string& value) : parserError("Long parameters need two hyphens (" + value + " is wrong)\n") {}
+        explicit badFormatLongArgument(const std::string& value) : parserError("Long parameters need two hyphens (" + value + " is wrong)\n") {}
     };
 
     struct sameLongAndShortParameters : public parserError {
@@ -26,17 +26,17 @@ namespace pparser {
     };
 
     struct missingArgument : public parserError {
-        missingArgument(std::string& l) : parserError("--" + l + " requires an argument!\n") {}
-        missingArgument(char s) : parserError("-" + std::string(1, s) + " requires an argument!\n") {}
+        explicit missingArgument(std::string& l) : parserError("--" + l + " requires an argument!\n") {}
+        explicit missingArgument(char s) : parserError("-" + std::string(1, s) + " requires an argument!\n") {}
     };
 
     struct unnecessaryArgument : public parserError {
-        unnecessaryArgument(std::string& l) : parserError("--" + l + " does not requires any argument!\n") {}
-        unnecessaryArgument(char s) : parserError("-" + std::string(1, s) + " does not requires any argument!\n") {}
+        explicit unnecessaryArgument(std::string& l) : parserError("--" + l + " does not requires any argument!\n") {}
+        explicit unnecessaryArgument(char s) : parserError("-" + std::string(1, s) + " does not requires any argument!\n") {}
     };
 
     struct missingParameter : public parserError {
         missingParameter(char s, std::string& l) : parserError("-" + std::string(1, s) + " or " + "--" + l + " need to be defined!\n") {};
-        missingParameter(std::string& l) : parserError("--" + l + " need to be defined!\n") {};
+        explicit missingParameter(std::string& l) : parserError("--" + l + " need to be defined!\n") {};
     };
 }

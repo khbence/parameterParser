@@ -87,7 +87,7 @@ namespace pparser {
         bool isErrorHappened() const { return __errorHappened; } \
         typedef \
         ::pparser::internal::FlattenRecursiveTypelist<decltype(__list_maker_helper(::pparser::internal::Counter<__COUNTER__>{}))>::value \
-        __member_typelist;
+        __member_typelist
     }
 
     namespace impl {
@@ -159,7 +159,7 @@ namespace pparser {
 
         template<typename T>
         struct setTrue<bool, T> {
-            void operator()() { (*T::memberPointer) = true; }
+            void operator()() const { (*T::memberPointer) = true; }
         };
 
         template <typename T>
@@ -265,7 +265,7 @@ namespace pparser {
     }
 
     template<typename T>
-    std::string createHelp(std::string help, T defaultValue) {
+    std::string createHelp(const std::string& help, T defaultValue) {
         std::stringstream ss;
         ss << help << " [default: " << defaultValue << "]";
         std::string ret = ss.str();
